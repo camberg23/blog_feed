@@ -49,7 +49,7 @@ def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, ti
     # Prepare the output list with title, URL, and content
     output_list = []
     for index, (title, url, content) in enumerate(zip(top_n_content_titles, top_n_content_urls, top_n_contents), start=1):
-        output_list.append(f"{index}. **[Title]({url})**: {title} \n**Content Preview**: {content}...")
+        output_list.append(f"{index}. **[{title}]({url})**\n**Content Preview**: {content}...")
     
     return output_list
 
@@ -73,6 +73,6 @@ input_text = " ".join(selected_themes) + " " + custom_text
 # Find top n similar texts
 if st.button("Generate Blog Feed"):
     top_n_content_list = find_top_n_similar_texts(input_text, blog_df, n, content_preview_length, title_search)
-    for n in top_n_content_list:
-        st.markdown(n)
+    for item in top_n_content_list:
+        st.markdown(item)
         st.markdown("---")
