@@ -49,7 +49,7 @@ def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, ti
     # Prepare the output list with title, URL, and content
     output_list = []
     for index, (title, url, content) in enumerate(zip(top_n_content_titles, top_n_content_urls, top_n_contents), start=1):
-        output_list.append(f"{index}. **[{title}]({url})**\n**Content Preview**: {content}...")
+        output_list.append(f"{index}. **[{title}]({url})**\n\n**Content Preview**: {content}...\n")
     
     return output_list
 
