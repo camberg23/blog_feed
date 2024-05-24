@@ -10,13 +10,14 @@ API_KEY = st.secrets['API_KEY']
 # Initialize OpenAI client with your API key
 client = OpenAI(api_key=API_KEY)
 
-def get_embedding(text, model="text-embedding-ada-002"):
+def get_embedding(text, model="text-embedding-3-small"):
     response = client.embeddings.create(
         model=model,
-        input=text
+        input=text,
+        encoding_format="float"
     )
-    return response['data'][0]['embedding']
-
+    return response.data[0].embedding
+    
 def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, title_search=None):
     # Filter the DataFrame based on title search if provided
     if title_search:
