@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from openai import OpenAI
-from tqdm import tqdm
 
 API_KEY = st.secrets['API_KEY']
 
