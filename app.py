@@ -49,7 +49,7 @@ def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, ti
     # Prepare the output list with title, URL, and content
     output_list = []
     for index, (title, url, content) in enumerate(zip(top_n_content_titles, top_n_content_urls, top_n_contents), start=1):
-        output_list.append(f"{index}. **Title**: {title} \n**URL**: {url} \n**Content Preview**: {content}...")
+        output_list.append(f"{index}. **[Title]({url})**: {title} \n**Content Preview**: {content}...")
     
     return output_list
 
@@ -57,16 +57,21 @@ def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, ti
 blog_df = pd.read_pickle('blog_df.pkl')
 
 # Streamlit App
-st.title("Blog Post Similarity Finder")
+st.title("Blog Feed Tool")
 
 # User inputs
-input_text = st.text_area("Input Text", "relationships")
-title_search = st.text_input("Title Search (Optional)", "Type 2")
+themes = ["Relationships", "Work", "Romance", "Health", "Finance", "Personal Development", "Hobbies", "Technology", "Education", "Travel", "Food", "Lifestyle", "Parenting", "Fitness", "Mental Health"]
+selected_themes = st.multiselect("Select Themes", themes)
+custom_text = st.text_input("Add Custom Phrases (Optional)", "")
+title_search = st.text_input("Title Search (Optional)", "")
 n = st.slider("Number of Results", min_value=1, max_value=20, value=5)
 content_preview_length = st.slider("Content Preview Length", min_value=50, max_value=500, value=100)
 
+# Combine selected themes and custom text for input text
+input_text = " ".join(selected_themes) + " " + custom_text
+
 # Find top n similar texts
-if st.button("Find Similar Blog Posts"):
+if st.button("Generate Blog Feed"):
     top_n_content_list = find_top_n_similar_texts(input_text, blog_df, n, content_preview_length, title_search)
     for n in top_n_content_list:
         st.markdown(n)
