@@ -75,7 +75,7 @@ if 'content_preview_length' not in st.session_state:
 themes = ["Relationships", "Work", "Romance", "Health", "Finance", "Personal Development", "Hobbies", "Technology", "Education", "Travel", "Food", "Lifestyle", "Parenting", "Fitness", "Mental Health"]
 selected_themes = st.multiselect("Select Themes", themes, default=st.session_state.themes)
 custom_text = st.text_input("Any Custom Phrases (will try to search for semantically related content)", st.session_state.custom_text)
-title_search = st.text_input("Title Search (will require blog titles to include this exact input)", st.session_state.title_search)
+title_search = st.text_input("Any Required Keywords (will require blog titles to include this exact input)", st.session_state.title_search)
 n = st.slider("Number of Results", min_value=1, max_value=20, value=st.session_state.n)
 content_preview_length = st.slider("Content Preview Length", min_value=50, max_value=500, value=st.session_state.content_preview_length)
 
