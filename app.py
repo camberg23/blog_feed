@@ -69,7 +69,7 @@ if 'title_search' not in st.session_state:
 if 'n' not in st.session_state:
     st.session_state.n = 5
 if 'content_preview_length' not in st.session_state:
-    st.session_state.content_preview_length = 100
+    st.session_state.content_preview_length = 350
 
 # User inputs
 themes = ["Relationships", "Work", "Romance", "Health", "Finance", "Personal Development", "Hobbies", "Technology", "Education", "Travel", "Food", "Lifestyle", "Parenting", "Fitness", "Mental Health"]
