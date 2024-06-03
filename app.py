@@ -82,7 +82,6 @@ content_preview_length = st.slider("Content Preview Length", min_value=50, max_v
 # Update session state
 if selected_themes:
     st.session_state.themes = selected_themes
-    st.rerun()
 if custom_text:
     st.session_state.custom_text = custom_text
 if title_search:
