@@ -70,6 +70,7 @@ with st.expander("Tool Logic/Directions"):
     - **Themes**: If no Search Term is provided, the tool will iteratively search for the selected themes. 
         - If a personality type is provided, it will be combined with each theme to filter the results.
         - If no personality type is provided, it will simply search for the themes.
+        - If the toggle is enabled, for each theme, `n` results will be returned with the personality type constraint and `n` results without it, resulting in `2n` results per theme.
     """)
 
 # Initialize session state variables
@@ -118,12 +119,15 @@ else:
     input_text = " ".join(selected_themes)
 
 # Function to process and filter based on themes and personality type
-def process_and_filter(df, themes, personality_type, n, content_preview_length):
+def process_and_filter(df, themes, personality_type, n, content_preview_length, toggle):
     results = []
     for theme in themes:
         input_text = theme
         filtered_results = find_top_n_similar_texts(input_text, df, n, content_preview_length, personality_type)
         results.extend(filtered_results)
+        if toggle:
+            unfiltered_results = find_top_n_similar_texts(input_text, df, n, content_preview_length)
+            results.extend(unfiltered_results)
     return results
 
 # Generate Blog Feed based on user input
@@ -136,11 +140,12 @@ if st.button("Generate Blog Feed"):
         else:
             top_n_content_list = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
     else:
-        top_n_content_list = process_and_filter(blog_df, selected_themes, title_or_personality_search, n, content_preview_length)
+        top_n_content_list = process_and_filter(blog_df, selected_themes, title_or_personality_search, n, content_preview_length, toggle_title_search)
     
     for item in top_n_content_list:
         st.markdown(item)
         st.markdown("---")
+
 
 # import streamlit as st
 # import pandas as pd
