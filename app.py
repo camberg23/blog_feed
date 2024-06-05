@@ -107,7 +107,13 @@ def process_and_filter(df, themes, personality_type, n, content_preview_length):
 # Generate Blog Feed based on user input
 if st.button("Generate Blog Feed"):
     if custom_text:
-        top_n_content_list = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
+        # If both custom_text and title_or_personality_search are provided, get n results for each case
+        if title_or_personality_search:
+            results_without_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
+            results_with_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length, title_or_personality_search)
+            top_n_content_list = results_without_title_search + results_with_title_search
+        else:
+            top_n_content_list = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
     else:
         top_n_content_list = process_and_filter(blog_df, selected_themes, title_or_personality_search, n, content_preview_length)
     
