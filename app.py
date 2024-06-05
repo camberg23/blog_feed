@@ -59,6 +59,15 @@ blog_df = pd.read_pickle('blog_df.pkl')
 # Streamlit App
 st.title("Blog Feed Tool")
 
+# Add explanatory text
+st.write("""
+## Tool Logic
+- **Search Term**: If provided, the tool will prioritize this and ignore themes.
+- **Title or Personality Type Search**: If provided, the tool will filter results to include this exact input in titles.
+- **Number of Results**: Specifies how many results to retrieve per theme if no Search Term is provided.
+- **Toggle**: If enabled, performs `n` searches with and without the title/personality search when a Search Term is provided.
+""")
+
 # Initialize session state variables
 if 'themes' not in st.session_state:
     st.session_state.themes = []
@@ -70,13 +79,21 @@ if 'n' not in st.session_state:
     st.session_state.n = 5
 if 'content_preview_length' not in st.session_state:
     st.session_state.content_preview_length = 350
+if 'toggle_title_search' not in st.session_state:
+    st.session_state.toggle_title_search = False
 
 # User inputs
 themes = ["Relationships", "Work", "Romance", "Health", "Finance", "Personal Development", "Hobbies", "Technology", "Education", "Travel", "Food", "Lifestyle", "Parenting", "Fitness", "Mental Health"]
 selected_themes = st.multiselect("Select Themes", themes, default=st.session_state.themes)
 custom_text = st.text_input("Search Term (will prioritize this over other inputs)", st.session_state.custom_text)
 title_or_personality_search = st.text_input("Title or Personality Type Search (will require blog titles to include this exact input)", st.session_state.title_or_personality_search)
-n = st.slider("Number of Results per Theme (if no Search Term)", min_value=1, max_value=20, value=st.session_state.n)
+
+col1, col2 = st.columns([3, 1])
+with col1:
+    n = st.slider("Number of Results per Theme (if no Search Term)", min_value=1, max_value=20, value=st.session_state.n)
+with col2:
+    toggle_title_search = st.checkbox("Enable Title Search Toggle", value=st.session_state.toggle_title_search)
+
 content_preview_length = st.slider("Content Preview Length", min_value=50, max_value=500, value=st.session_state.content_preview_length)
 
 # Update session state
@@ -88,6 +105,7 @@ if title_or_personality_search:
     st.session_state.title_or_personality_search = title_or_personality_search
 st.session_state.n = n
 st.session_state.content_preview_length = content_preview_length
+st.session_state.toggle_title_search = toggle_title_search
 
 # Combine selected themes and custom text for input text
 if custom_text:
@@ -107,8 +125,7 @@ def process_and_filter(df, themes, personality_type, n, content_preview_length):
 # Generate Blog Feed based on user input
 if st.button("Generate Blog Feed"):
     if custom_text:
-        # If both custom_text and title_or_personality_search are provided, get n results for each case
-        if title_or_personality_search:
+        if toggle_title_search and title_or_personality_search:
             results_without_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
             results_with_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length, title_or_personality_search)
             top_n_content_list = results_without_title_search + results_with_title_search
