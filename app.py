@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from openai import OpenAI
+import re
 
 API_KEY = st.secrets['API_KEY']
 
@@ -17,18 +18,20 @@ def get_embedding(text, model="text-embedding-3-small"):
     )
     return response.data[0].embedding
 
-def exclude_other_types(title, search_type, all_types):
-    for other_type in all_types:
-        if other_type != search_type and other_type in title:
-            return False
-    return True
-
-def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, title_or_personality_search=None):
-    # Define sets of MBTI and Enneagram types
-    mbti_types = {"INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", 
-                  "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"}
-    enneagram_types = {f"Type {i}" for i in range(1, 10)}
-
+def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, title_or_personality_search=None, exclude_non_type_content=None):
+    # Filter the DataFrame based on title or personality type search if provided
+    if title_or_personality_search:
+        df = df[df['title'].str.contains(title_or_personality_search, case=False, na=False)]
+    
+    if exclude_non_type_content:
+        type_pattern = re.compile(r'\b(?:ISFJ|ESFJ|ENTP|INTJ|INFP|INFJ|ENFP|ISTJ|ESTJ|ISTP|ESTP|ESFP|ENFJ|ISFP|INTP|ENTJ)\b|\b(?:Type\s[1-9])\b')
+        excluded_types = [match for match in type_pattern.findall(df['title'].str.cat(sep=' ')) if match.lower() != exclude_non_type_content.lower()]
+        for excluded_type in excluded_types:
+            df = df[~df['title'].str.contains(excluded_type, case=False, na=False)]
+    
+    if df.empty:
+        return ["No matches found for the provided search criteria."]
+    
     # Generate embedding for the input text
     input_embedding = get_embedding(input_text)
     
@@ -126,11 +129,11 @@ else:
 def process_and_filter(df, themes, personality_type, n, content_preview_length, toggle):
     results = []
     for theme in themes:
-        if personality_type:
+        if toggle and personality_type:
             filtered_results = find_top_n_similar_texts(theme, df, n, content_preview_length, personality_type)
             results.extend(filtered_results)
         else:
-            unfiltered_results = find_top_n_similar_texts(theme, df, n, content_preview_length)
+            unfiltered_results = find_top_n_similar_texts(theme, df, n, content_preview_length, exclude_non_type_content=personality_type)
             results.extend(unfiltered_results)
     return results
 
@@ -139,17 +142,16 @@ if st.button("Generate Blog Feed"):
     if custom_text:
         if toggle_title_search and title_or_personality_search:
             results_with_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length, title_or_personality_search)
-            results_without_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
+            results_without_title_search = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length, exclude_non_type_content=title_or_personality_search)
             top_n_content_list = results_with_title_search + results_without_title_search
         else:
-            top_n_content_list = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length)
+            top_n_content_list = find_top_n_similar_texts(custom_text, blog_df, n, content_preview_length, exclude_non_type_content=title_or_personality_search)
     else:
         top_n_content_list = process_and_filter(blog_df, selected_themes, title_or_personality_search, n, content_preview_length, toggle_title_search)
     
     for item in top_n_content_list:
         st.markdown(item)
         st.markdown("---")
-
 
 
 # OLDER VERSION
