@@ -18,9 +18,17 @@ def get_embedding(text, model="text-embedding-3-small"):
     return response.data[0].embedding
 
 def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, title_or_personality_search=None):
+    # Define sets of MBTI and Enneagram types
+    mbti_types = {"INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", 
+                  "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"}
+    enneagram_types = {f"Type {i}" for i in range(1, 10)}
+
     # Filter the DataFrame based on title or personality type search if provided
     if title_or_personality_search:
         df = df[df['title'].str.contains(title_or_personality_search, case=False, na=False)]
+        other_types = (mbti_types | enneagram_types) - {title_or_personality_search}
+        exclusion_mask = df['title'].apply(lambda x: all(other_type not in x for other_type in other_types))
+        df = df[exclusion_mask]
     
     if df.empty:
         return ["No matches found for the provided search criteria."]
