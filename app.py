@@ -100,7 +100,7 @@ selected_themes = st.multiselect("Select Themes", themes, default=st.session_sta
 
 # Select box for Personality Type Search
 personality_types = ["ISFJ", "ESFJ", "ENTP", "INTJ", "INFP", "INFJ", "ENFP", "ISTJ", "ESTJ", "ISTP", "ESTP", "ESFP", "ENFJ", "ISFP", "INTP", "ENTJ", "Type 1", "Type 2", "Type 3", "Type 4", "Type 5", "Type 6", "Type 7", "Type 8", "Type 9"]
-title_or_personality_search = st.selectbox("Personality Type Search", [None] + personality_types, index=0)
+title_or_personality_search = st.selectbox("Personality Type Search", [""] + personality_types, index=0)
 
 custom_text = st.text_input("Search Term (will prioritize this over other inputs)", st.session_state.custom_text)
 
