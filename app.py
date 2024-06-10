@@ -97,8 +97,12 @@ if 'toggle_title_search' not in st.session_state:
 # User inputs
 themes = ["Relationships", "Work", "Romance", "Health", "Finance", "Personal Development", "Hobbies", "Technology", "Education", "Travel", "Food", "Lifestyle", "Parenting", "Fitness", "Mental Health"]
 selected_themes = st.multiselect("Select Themes", themes, default=st.session_state.themes)
+
+# Select box for Personality Type Search
+personality_types = ["ISFJ", "ESFJ", "ENTP", "INTJ", "INFP", "INFJ", "ENFP", "ISTJ", "ESTJ", "ISTP", "ESTP", "ESFP", "ENFJ", "ISFP", "INTP", "ENTJ", "Type 1", "Type 2", "Type 3", "Type 4", "Type 5", "Type 6", "Type 7", "Type 8", "Type 9"]
+title_or_personality_search = st.selectbox("Personality Type Search", [None] + personality_types, index=0)
+
 custom_text = st.text_input("Search Term (will prioritize this over other inputs)", st.session_state.custom_text)
-title_or_personality_search = st.text_input("Personality Type Search (will require blog titles to include this exact input)", st.session_state.title_or_personality_search)
 
 col1, col2 = st.columns([3, 1])
 with col1:
@@ -132,7 +136,7 @@ def process_and_filter(df, themes, personality_type, n, content_preview_length, 
         if toggle and personality_type:
             filtered_results = find_top_n_similar_texts(theme, df, n, content_preview_length, personality_type)
             results.extend(filtered_results)
-        else:
+        if not toggle or personality_type:
             unfiltered_results = find_top_n_similar_texts(theme, df, n, content_preview_length, exclude_non_type_content=personality_type)
             results.extend(unfiltered_results)
     return results
