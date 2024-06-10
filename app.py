@@ -17,30 +17,18 @@ def get_embedding(text, model="text-embedding-3-small"):
     )
     return response.data[0].embedding
 
-# Exclude blogs with titles that contain any other personality types
 def exclude_other_types(title, search_type, all_types):
     for other_type in all_types:
         if other_type != search_type and other_type in title:
             return False
     return True
 
-# Updated find_top_n_similar_texts function
 def find_top_n_similar_texts(input_text, df, n=5, content_preview_length=100, title_or_personality_search=None):
     # Define sets of MBTI and Enneagram types
     mbti_types = {"INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", 
                   "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"}
     enneagram_types = {f"Type {i}" for i in range(1, 10)}
 
-    # Filter the DataFrame based on title or personality type search if provided
-    if title_or_personality_search:
-        df = df[df['title'].str.contains(title_or_personality_search, case=False, na=False)]
-        other_types = (mbti_types | enneagram_types) - {title_or_personality_search}
-        exclusion_mask = df['title'].apply(lambda x: exclude_other_types(x, title_or_personality_search, other_types))
-        df = df[exclusion_mask]
-    
-    if df.empty:
-        return ["No matches found for the provided search criteria."]
-    
     # Generate embedding for the input text
     input_embedding = get_embedding(input_text)
     
@@ -138,7 +126,7 @@ else:
 def process_and_filter(df, themes, personality_type, n, content_preview_length, toggle):
     results = []
     for theme in themes:
-        if toggle and personality_type:
+        if personality_type:
             filtered_results = find_top_n_similar_texts(theme, df, n, content_preview_length, personality_type)
             results.extend(filtered_results)
         else:
@@ -161,6 +149,7 @@ if st.button("Generate Blog Feed"):
     for item in top_n_content_list:
         st.markdown(item)
         st.markdown("---")
+
 
 
 # OLDER VERSION
