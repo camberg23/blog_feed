@@ -88,7 +88,7 @@ if 'custom_text' not in st.session_state:
 if 'title_or_personality_search' not in st.session_state:
     st.session_state.title_or_personality_search = ""
 if 'n' not in st.session_state:
-    st.session_state.n = 5
+    st.session_state.n = 2
 if 'content_preview_length' not in st.session_state:
     st.session_state.content_preview_length = 350
 if 'toggle_title_search' not in st.session_state:
